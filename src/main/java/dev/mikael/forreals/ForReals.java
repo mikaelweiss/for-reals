@@ -1,6 +1,7 @@
 package dev.mikael.forreals;
 
 import net.fabricmc.api.ModInitializer;
+import dev.mikael.forreals.body.Body;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.time.ChunkClock;
 import dev.mikael.forreals.time.WorldTime;
@@ -20,6 +21,7 @@ public class ForReals implements ModInitializer {
 	public void onInitialize() {
 		ServerTickEvents.START_SERVER_TICK.register(WorldTime::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Weather::showPlayersTheirSky);
+		ServerTickEvents.END_SERVER_TICK.register(Body::tick);
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> ChunkClock.chunkLoaded(level, chunk));
 		ServerChunkEvents.CHUNK_UNLOAD.register(ChunkClock::chunkUnloaded);
 		ChunkClock.onCatchUp(SnowAndIce::catchUp);

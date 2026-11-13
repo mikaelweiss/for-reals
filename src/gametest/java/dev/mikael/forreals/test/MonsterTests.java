@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.Blocks;
 
@@ -17,7 +18,7 @@ public class MonsterTests {
 	public void noMonsterSpawnsUnderOpenSky(final GameTestHelper helper) {
 		helper.succeedWhen(() -> {
 			helper.assertTrue(spawns(helper, MobCategory.MONSTER).isEmpty(), "monsters can spawn under open sky");
-			helper.assertTrue(spawns(helper, MobCategory.CREATURE) == biomeSpawns(helper, MobCategory.CREATURE), "animals lost their spawn list");
+			helper.assertTrue(spawns(helper, MobCategory.CREATURE).unwrap().equals(biomeSpawns(helper, MobCategory.CREATURE).unwrap()), "animals lost their spawn list");
 		});
 	}
 
@@ -36,7 +37,10 @@ public class MonsterTests {
 		}
 
 		helper.succeedWhen(
-			() -> helper.assertTrue(spawns(helper, MobCategory.MONSTER) == biomeSpawns(helper, MobCategory.MONSTER), "monsters cannot spawn in the dark")
+			() -> helper.assertTrue(
+				spawns(helper, MobCategory.MONSTER).unwrap().equals(biomeSpawns(helper, MobCategory.MONSTER).unwrap()),
+				"monsters cannot spawn in the dark, sky light " + helper.getLevel().getBrightness(LightLayer.SKY, helper.absolutePos(SPOT))
+			)
 		);
 	}
 

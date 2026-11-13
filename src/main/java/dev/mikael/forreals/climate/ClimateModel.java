@@ -10,6 +10,7 @@ public final class ClimateModel {
 	private static final double SEASONAL_LAG = 0.125;
 	private static final int WARMEST_TIME_OF_DAY = 8000;
 	private static final double BLOCKS_PER_DEGREE = 10;
+	private static final double BLOCKS_DOWN_PER_DEGREE = 16;
 
 	private ClimateModel() {
 	}
@@ -26,9 +27,9 @@ public final class ClimateModel {
 			+ airMass;
 	}
 
-	/** Under cover the ground holds the yearly average, as a cave does. */
+	/** Under cover the ground holds the yearly average, as a cave does. Deep rock is warmer. */
 	public static double underCover(final BiomeClimate climate, final int blocksAboveSea) {
-		return climate.yearlyMean() + altitudeOffset(blocksAboveSea);
+		return climate.yearlyMean() + altitudeOffset(blocksAboveSea) + Math.max(0, -blocksAboveSea) / BLOCKS_DOWN_PER_DEGREE;
 	}
 
 	public static double seasonalOffset(final BiomeClimate climate, final long ticks) {

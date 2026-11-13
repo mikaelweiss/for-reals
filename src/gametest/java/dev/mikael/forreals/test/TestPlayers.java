@@ -6,6 +6,7 @@ import java.util.UUID;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.ServerboundPlayerLoadedPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
@@ -22,15 +23,13 @@ final class TestPlayers {
 	static ServerPlayer join(final GameTestHelper helper, final GameType mode) {
 		MinecraftServer server = helper.getLevel().getServer();
 		CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(UUID.randomUUID(), "test-player"), false);
-		ServerPlayer player = new ServerPlayer(server, helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
-			@Override
-			public GameType gameMode() {
-				return mode;
-			}
-		};
+		ServerPlayer player = new ServerPlayer(server, helper.getLevel(), cookie.gameProfile(), cookie.clientInformation());
 		Connection connection = new Connection(PacketFlow.SERVERBOUND);
 		new EmbeddedChannel(connection);
 		server.getPlayerList().placeNewPlayer(connection, player, cookie);
+		player.setGameMode(mode);
+		// A player cannot be hurt until its client says the world has loaded.
+		player.connection.handleAcceptPlayerLoad(new ServerboundPlayerLoadedPacket());
 		return player;
 	}
 

@@ -11,7 +11,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.clock.WorldClocks;
 
 final class TestClimate {
-	/** Tests that move the calendar or force the weather run in their own batch, one after another. */
+	/**
+	 * Tests that move the calendar, pin a climate, or force the weather run in their own batch. They share one world,
+	 * so each sets what it needs and checks it within the same tick.
+	 */
 	static final String ENVIRONMENT = "forreals-test:own_calendar";
 
 	static final BiomeClimate FROZEN = BiomeClimate.fromVanilla(-0.5, 0.8);
@@ -39,6 +42,12 @@ final class TestClimate {
 		long clockNow = helper.getLevel().getOverworldClockTime();
 		long epoch = clockNow - WorldTime.ticks(server);
 		server.clockManager().setTotalTicks(server.registryAccess().get(WorldClocks.OVERWORLD).orElseThrow(), epoch + calendarTicks);
+		forgetCachedWeather();
+	}
+
+	/** The sky over a test is whatever the random seed made it. Tests about temperature hold it clear. */
+	static void clearSkies(final GameTestHelper helper) {
+		helper.getLevel().getServer().setWeatherParameters(1_000_000, 0, false, false);
 		forgetCachedWeather();
 	}
 
