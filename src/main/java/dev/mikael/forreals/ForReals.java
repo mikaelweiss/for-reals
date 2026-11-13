@@ -1,6 +1,7 @@
 package dev.mikael.forreals;
 
 import net.fabricmc.api.ModInitializer;
+import dev.mikael.forreals.animals.Herds;
 import dev.mikael.forreals.body.Body;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.plants.Crops;
@@ -9,7 +10,9 @@ import dev.mikael.forreals.time.ChunkClock;
 import dev.mikael.forreals.time.WorldTime;
 import dev.mikael.forreals.weather.SnowAndIce;
 import dev.mikael.forreals.weather.Weather;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import org.slf4j.Logger;
@@ -24,6 +27,10 @@ public class ForReals implements ModInitializer {
 		ServerTickEvents.START_SERVER_TICK.register(WorldTime::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Weather::showPlayersTheirSky);
 		ServerTickEvents.END_SERVER_TICK.register(Body::tick);
+		ServerTickEvents.END_SERVER_TICK.register(Herds::tick);
+		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> Herds.chunkLoaded(level, chunk));
+		ServerEntityEvents.ENTITY_UNLOAD.register(Herds::entityUnloaded);
+		ServerLivingEntityEvents.AFTER_DEATH.register(Herds::died);
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> ChunkClock.chunkLoaded(level, chunk));
 		ServerChunkEvents.CHUNK_UNLOAD.register(ChunkClock::chunkUnloaded);
 		ChunkClock.onCatchUp(SnowAndIce::catchUp);
@@ -34,6 +41,7 @@ public class ForReals implements ModInitializer {
 			Climate.forgetWorld();
 			Weather.forgetWorld();
 			SnowAndIce.forgetWorld();
+			Herds.forgetWorld();
 		});
 		ServerLifecycleEvents.SERVER_STARTED.register(server ->
 				LOGGER.info("For Reals loaded on {} server", server.isDedicatedServer() ? "dedicated" : "integrated"));

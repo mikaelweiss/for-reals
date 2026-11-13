@@ -1,5 +1,6 @@
 package dev.mikael.forreals.test;
 
+import dev.mikael.forreals.animals.SpeciesTypes;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -18,7 +19,10 @@ public class MonsterTests {
 	public void noMonsterSpawnsUnderOpenSky(final GameTestHelper helper) {
 		helper.succeedWhen(() -> {
 			helper.assertTrue(spawns(helper, MobCategory.MONSTER).isEmpty(), "monsters can spawn under open sky");
-			helper.assertTrue(spawns(helper, MobCategory.CREATURE).unwrap().equals(biomeSpawns(helper, MobCategory.CREATURE).unwrap()), "animals lost their spawn list");
+			helper.assertTrue(
+				spawns(helper, MobCategory.CREATURE).unwrap().equals(SpeciesTypes.withoutHerdAnimals(biomeSpawns(helper, MobCategory.CREATURE)).unwrap()),
+				"animals that do not live in herds lost their spawn list"
+			);
 		});
 	}
 

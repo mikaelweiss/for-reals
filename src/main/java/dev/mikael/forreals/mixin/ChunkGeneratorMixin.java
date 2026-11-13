@@ -1,5 +1,7 @@
 package dev.mikael.forreals.mixin;
 
+import dev.mikael.forreals.animals.SpeciesTypes;
+import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.monsters.SurfaceSpawns;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.random.WeightedList;
@@ -17,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class ChunkGeneratorMixin {
 	// TAIL is the biome spawn list. Structure spawn lists return earlier, so outposts and witch huts keep their mobs.
 	@Inject(method = "getMobsAt", at = @At("TAIL"), cancellable = true)
-	private void forreals$noMonstersUnderOpenSky(
+	private void forreals$surfaceSpawnRules(
 		final Level level,
 		final StructureManager structureManager,
 		final MobCategory mobCategory,
@@ -26,6 +28,8 @@ abstract class ChunkGeneratorMixin {
 	) {
 		if (SurfaceSpawns.isBlocked(level, mobCategory, pos)) {
 			cir.setReturnValue(WeightedList.of());
+		} else if (mobCategory == MobCategory.CREATURE && Climate.hasClimate(level)) {
+			cir.setReturnValue(SpeciesTypes.withoutHerdAnimals(cir.getReturnValue()));
 		}
 	}
 }
