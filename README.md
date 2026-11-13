@@ -31,10 +31,17 @@ The design is in [docs/](docs): what vanilla gets wrong, the principles, and the
 
 Put the mod jar and the Fabric API jar in the `mods/` folder of a Fabric 26.3 server or client instance.
 
-Installing the mod changes nothing by itself. Each world chooses whether to use it, through a data pack named `forreals:core` that ships inside the jar and is off by default. A world with the pack off plays as vanilla.
+Installing the mod changes nothing by itself. Each world chooses whether to use it.
+
+## Turning it on for a world
+
+The switch is a data pack named `forreals:core` that ships inside the jar. It is off by default, and a world with it off plays as vanilla. Minecraft saves the choice in the world.
 
 - **New singleplayer world:** on the Create World screen, open Data Packs and move For Reals to the selected side.
+- **Existing singleplayer world:** run `/datapack enable "forreals:core"`, then save, quit, and reopen the world. The command needs cheats. In a world without them, use Open to LAN with cheats on first.
 - **New server world:** before the first start, add `forreals:core` to `initial-enabled-packs` in `server.properties`.
-- **Existing world or server:** run `/datapack enable "forreals:core"`, then close the world or restart the server. The mod starts when the world next loads.
+- **Existing server:** run `datapack enable "forreals:core"` in the console, then restart.
+
+The mod starts the next time the world loads, not when the pack is enabled. The log then says `For Reals is on for this world`.
 
 Choose once per world. A world that turns the pack off again keeps the new biomes in the chunks it already generated and loses its wild herd animals.
