@@ -2,6 +2,7 @@ package dev.mikael.forreals.animals;
 
 import com.mojang.serialization.Codec;
 import dev.mikael.forreals.ForReals;
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.time.Calendar;
 import dev.mikael.forreals.time.WorldTime;
 import java.util.HashSet;
@@ -91,7 +92,7 @@ public final class Owned {
 	}
 
 	public static void fedByPlayer(final Mob animal) {
-		if (SpeciesTypes.speciesOf(animal.getType()) == null) {
+		if (!Switch.isOn() || SpeciesTypes.speciesOf(animal.getType()) == null) {
 			return;
 		}
 

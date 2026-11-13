@@ -6,6 +6,7 @@ import dev.mikael.forreals.body.Body;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.plants.Crops;
 import dev.mikael.forreals.seasons.SeasonalLook;
+import dev.mikael.forreals.terrain.FilledOverworld;
 import dev.mikael.forreals.plants.WildPlants;
 import dev.mikael.forreals.time.ChunkClock;
 import dev.mikael.forreals.time.WorldTime;
@@ -25,6 +26,9 @@ public class ForReals implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		Switch.offerThePack();
+		FilledOverworld.register();
+		ServerLifecycleEvents.SERVER_STARTING.register(Switch::worldStarting);
 		ServerTickEvents.END_SERVER_TICK.register(SeasonalLook::tick);
 		ServerTickEvents.START_SERVER_TICK.register(WorldTime::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Weather::showPlayersTheirSky);
@@ -41,13 +45,12 @@ public class ForReals implements ModInitializer {
 		ChunkClock.onCatchUp(WildPlants::catchUp);
 		ServerLifecycleEvents.SERVER_STOPPING.register(ChunkClock::serverStopping);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			Switch.worldStopped();
 			Climate.forgetWorld();
 			Weather.forgetWorld();
 			SnowAndIce.forgetWorld();
 			Herds.forgetWorld();
 			SeasonalLook.forgetWorld();
 		});
-		ServerLifecycleEvents.SERVER_STARTED.register(server ->
-				LOGGER.info("For Reals loaded on {} server", server.isDedicatedServer() ? "dedicated" : "integrated"));
 	}
 }

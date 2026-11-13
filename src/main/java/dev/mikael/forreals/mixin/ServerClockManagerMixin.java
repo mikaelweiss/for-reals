@@ -1,5 +1,6 @@
 package dev.mikael.forreals.mixin;
 
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.time.WorldTime;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.clock.ServerClockManager;
@@ -16,7 +17,7 @@ abstract class ServerClockManagerMixin {
 
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
 	private void forreals$clocksStopOnAnEmptyServer(final CallbackInfo ci) {
-		if (WorldTime.isPaused(this.server)) {
+		if (Switch.isOn() && WorldTime.isPaused(this.server)) {
 			ci.cancel();
 		}
 	}

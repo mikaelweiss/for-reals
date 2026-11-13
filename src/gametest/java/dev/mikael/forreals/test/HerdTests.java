@@ -32,6 +32,8 @@ public class HerdTests {
 			}
 		}
 
+		// Frost kills grass and snow buries it, so herd tests hold the weather mild whatever the calendar says.
+		TestClimate.pin(helper, TestClimate.GROWING_WEATHER);
 		ServerLevel level = helper.getLevel();
 		BlockPos center = helper.absolutePos(new BlockPos(YARD / 2, 2, YARD / 2));
 		Herd herd = Herds.ecosystem(level.getServer()).addHerd(species, center.getX(), center.getZ(), count);
@@ -115,14 +117,16 @@ public class HerdTests {
 		}
 
 		int grass = count(helper, Blocks.SHORT_GRASS);
+		int[] grassWhenHungerBegan = {grass};
 		Mob cow = Herds.members(herd).iterator().next();
 		helper.runAfterDelay(100, () -> {
-			helper.assertTrue(count(helper, Blocks.SHORT_GRASS) == grass, "a cow with a full belly ate anyway");
+			helper.assertTrue(count(helper, Blocks.SHORT_GRASS) >= grass, "a cow with a full belly ate anyway");
+			grassWhenHungerBegan[0] = count(helper, Blocks.SHORT_GRASS);
 			Herds.setEnergy(cow, 0.3F);
 		});
 		helper.succeedWhen(() -> {
 			helper.assertTrue(helper.getTick() > 100, "still watching the full cow");
-			helper.assertTrue(count(helper, Blocks.SHORT_GRASS) < grass, "a hungry cow ate no grass");
+			helper.assertTrue(count(helper, Blocks.SHORT_GRASS) < grassWhenHungerBegan[0], "a hungry cow ate no grass");
 			helper.assertTrue(Herds.energyOf(cow) > 0.3F, "eating did not feed the cow");
 			sendAway(herd);
 		});

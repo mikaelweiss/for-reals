@@ -4,6 +4,7 @@ import dev.mikael.forreals.ForReals;
 import dev.mikael.forreals.climate.BiomeClimate;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.climate.ClimateModel;
+import dev.mikael.forreals.terrain.NewBiomes;
 import dev.mikael.forreals.time.Calendar;
 import dev.mikael.forreals.time.WorldTime;
 import dev.mikael.forreals.weather.Sky;
@@ -99,11 +100,11 @@ public final class SeasonalLook {
 	 * biome a datapack or another mod brings.
 	 */
 	public static void addTo(final WritableRegistry<Biome> registry) {
-		for (Map.Entry<ResourceKey<Biome>, Biome> entry : List.copyOf(registry.entrySet())) {
-			Identifier id = entry.getKey().identifier();
+		for (Holder.Reference<Biome> biome : registry.listElements().filter(Holder.Reference::isBound).toList()) {
+			Identifier id = biome.key().identifier();
 			boolean isALook = id.getNamespace().equals(ForReals.MOD_ID) && id.getPath().startsWith(PREFIX);
-			if (!isALook && !NEVER_SEE_THE_SKY.contains(entry.getKey())) {
-				registerLooksOf(registry, id, entry.getValue());
+			if (!isALook && !NEVER_SEE_THE_SKY.contains(biome.key())) {
+				registerLooksOf(registry, id, biome.value());
 			}
 		}
 	}
@@ -130,7 +131,7 @@ public final class SeasonalLook {
 			);
 			for (int precipitation = 0; precipitation < PRECIPITATION.length; precipitation++) {
 				ResourceKey<Biome> look = ResourceKey.create(Registries.BIOME, lookId(id, stage, precipitation));
-				if (registry.containsKey(look)) {
+				if (NewBiomes.loaded(registry, look).isPresent()) {
 					continue;
 				}
 

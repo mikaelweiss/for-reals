@@ -2,6 +2,7 @@ package dev.mikael.forreals.animals;
 
 import com.mojang.serialization.Codec;
 import dev.mikael.forreals.ForReals;
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.time.WorldTime;
 import dev.mikael.forreals.weather.Sky;
@@ -102,7 +103,7 @@ public final class Herds {
 	}
 
 	public static void tick(final MinecraftServer server) {
-		if (WorldTime.isPaused(server)) {
+		if (!Switch.isOn() || WorldTime.isPaused(server)) {
 			return;
 		}
 

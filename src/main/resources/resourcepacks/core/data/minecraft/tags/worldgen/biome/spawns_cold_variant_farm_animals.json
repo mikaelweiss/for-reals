@@ -1,0 +1,21 @@
+{
+	"replace": false,
+	"values": [
+		{
+			"id": "forreals:steppe",
+			"required": false
+		},
+		{
+			"id": "forreals:tundra",
+			"required": false
+		},
+		{
+			"id": "forreals:mixed_forest",
+			"required": false
+		},
+		{
+			"id": "forreals:temperate_rainforest",
+			"required": false
+		}
+	]
+}

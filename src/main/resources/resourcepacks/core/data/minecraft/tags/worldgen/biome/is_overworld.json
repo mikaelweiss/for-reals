@@ -1,0 +1,37 @@
+{
+	"replace": false,
+	"values": [
+		{
+			"id": "forreals:steppe",
+			"required": false
+		},
+		{
+			"id": "forreals:scrubland",
+			"required": false
+		},
+		{
+			"id": "forreals:prairie",
+			"required": false
+		},
+		{
+			"id": "forreals:marsh",
+			"required": false
+		},
+		{
+			"id": "forreals:mixed_forest",
+			"required": false
+		},
+		{
+			"id": "forreals:dry_woodland",
+			"required": false
+		},
+		{
+			"id": "forreals:temperate_rainforest",
+			"required": false
+		},
+		{
+			"id": "forreals:tundra",
+			"required": false
+		}
+	]
+}

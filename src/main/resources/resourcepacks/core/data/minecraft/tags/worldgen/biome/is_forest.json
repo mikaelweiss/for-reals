@@ -1,0 +1,17 @@
+{
+	"replace": false,
+	"values": [
+		{
+			"id": "forreals:mixed_forest",
+			"required": false
+		},
+		{
+			"id": "forreals:dry_woodland",
+			"required": false
+		},
+		{
+			"id": "forreals:temperate_rainforest",
+			"required": false
+		}
+	]
+}

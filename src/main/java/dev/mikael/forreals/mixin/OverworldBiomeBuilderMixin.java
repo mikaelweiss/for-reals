@@ -1,5 +1,6 @@
 package dev.mikael.forreals.mixin;
 
+import dev.mikael.forreals.terrain.GapFilling;
 import dev.mikael.forreals.terrain.NewBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -8,12 +9,9 @@ import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(OverworldBiomeBuilder.class)
-abstract class OverworldBiomeBuilderMixin {
+abstract class OverworldBiomeBuilderMixin implements GapFilling {
 	@Shadow
 	@Final
 	private ResourceKey<Biome>[][] MIDDLE_BIOMES;
@@ -22,8 +20,8 @@ abstract class OverworldBiomeBuilderMixin {
 	private ResourceKey<Biome>[][] MIDDLE_BIOMES_VARIANT;
 
 	// Both tables run from frozen to hot, then from dry to wet.
-	@Inject(method = "<init>", at = @At("TAIL"))
-	private void forreals$fillTheGapsBetweenBiomes(final CallbackInfo ci) {
+	@Override
+	public void forreals$fillTheGapsBetweenBiomes() {
 		this.MIDDLE_BIOMES[0][0] = NewBiomes.TUNDRA;
 		this.MIDDLE_BIOMES[1][0] = NewBiomes.STEPPE;
 		this.MIDDLE_BIOMES[1][2] = NewBiomes.MIXED_FOREST;

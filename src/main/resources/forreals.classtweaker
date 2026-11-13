@@ -5,3 +5,7 @@ accessible	field	net/minecraft/world/level/biome/Biome	climateSettings	Lnet/mine
 accessible	method	net/minecraft/server/level/ServerLevel	findLightningTargetAround	(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/core/BlockPos;
 accessible	field	net/minecraft/world/entity/Mob	goalSelector	Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 accessible	field	net/minecraft/world/entity/Mob	targetSelector	Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+accessible	method	net/minecraft/world/level/biome/OverworldBiomeBuilder	addBiomes	(Ljava/util/function/Consumer;)V
+accessible	class	net/minecraft/world/level/biome/MultiNoiseBiomeSourceParameterList$Preset$SourceProvider
+accessible	field	net/minecraft/world/level/biome/MultiNoiseBiomeSourceParameterList$Preset	BY_NAME	Ljava/util/Map;
+accessible	field	net/minecraft/resources/ResourceManagerRegistryLoadTask	resourceManager	Lnet/minecraft/server/packs/resources/ResourceManager;

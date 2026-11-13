@@ -1,6 +1,7 @@
 package dev.mikael.forreals.climate;
 
 import com.google.common.annotations.VisibleForTesting;
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.time.WorldTime;
 import dev.mikael.forreals.weather.Sky;
 import dev.mikael.forreals.weather.Weather;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-/** The temperature of places in a running world. Only the overworld has a climate. */
+/** The temperature of places in a running world. Only the overworld has a climate, and only in a world that uses the mod. */
 public final class Climate {
 	/** Biomes are read far above the ground, where the surface biome reaches and cave biomes do not. */
 	private static final int BIOME_PROBE_ABOVE_SEA = 128;
@@ -39,7 +40,7 @@ public final class Climate {
 	}
 
 	public static boolean hasClimate(final Level level) {
-		return level.dimension() == Level.OVERWORLD;
+		return Switch.isOn() && level.dimension() == Level.OVERWORLD;
 	}
 
 	public static void forgetWorld() {

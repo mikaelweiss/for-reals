@@ -1,5 +1,6 @@
 package dev.mikael.forreals.mixin;
 
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.seasons.SeasonalLook;
 import dev.mikael.forreals.terrain.NewBiomes;
 import java.util.stream.Stream;
@@ -23,14 +24,15 @@ abstract class RegistryLoadTaskMixin<T> {
 	private WritableRegistry<T> registry;
 
 	// Runs once every biome file has been read, while the registry can still be added to. A client that receives its
-	// registries from a server gets these biomes sent to it, so only a registry read from files is added to.
+	// registries from a server gets these biomes sent to it, so only a registry read from files is added to, and only
+	// for a world that has the mod's data pack on.
 	@SuppressWarnings("unchecked")
 	@Inject(
 		method = "registerElements",
 		at = @At(value = "FIELD", target = "Lnet/minecraft/resources/RegistryLoadTask;elementsRegistered:Z", opcode = Opcodes.PUTFIELD)
 	)
 	private void forreals$addBiomesMadeFromOthers(final Stream<?> elements, final CallbackInfo ci) {
-		if ((Object)this instanceof ResourceManagerRegistryLoadTask<?> && this.registry.key().equals(Registries.BIOME)) {
+		if ((Object)this instanceof ResourceManagerRegistryLoadTask<?> fromFiles && this.registry.key().equals(Registries.BIOME) && Switch.isOnIn(fromFiles.resourceManager)) {
 			WritableRegistry<Biome> biomes = (WritableRegistry<Biome>)this.registry;
 			NewBiomes.addTo(biomes);
 			SeasonalLook.addTo(biomes);

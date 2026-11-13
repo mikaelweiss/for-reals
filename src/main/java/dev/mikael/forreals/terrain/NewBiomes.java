@@ -2,10 +2,12 @@ package dev.mikael.forreals.terrain;
 
 import dev.mikael.forreals.ForReals;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistrationInfo;
+import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -67,16 +69,25 @@ public final class NewBiomes {
 	 * lists can follow one order that agrees with every biome already there, including any a datapack brought.
 	 */
 	public static void addTo(final WritableRegistry<Biome> registry) {
-		List<List<List<Holder<PlacedFeature>>>> everyBiomesSteps = registry.stream()
-			.map(biome -> biome.getGenerationSettings().features().stream().map(step -> step.stream().toList()).toList())
+		List<List<List<Holder<PlacedFeature>>>> everyBiomesSteps = registry.listElements()
+			.filter(Holder.Reference::isBound)
+			.map(biome -> biome.value().getGenerationSettings().features().stream().map(step -> step.stream().toList()).toList())
 			.toList();
 		for (Recipe recipe : RECIPES) {
-			Biome base = registry.getValue(recipe.base);
-			Biome other = registry.getValue(recipe.other);
-			if (base != null && other != null && !registry.containsKey(recipe.made)) {
-				registry.register(recipe.made, make(recipe, base, other, everyBiomesSteps), RegistrationInfo.BUILT_IN);
+			Optional<Biome> base = loaded(registry, recipe.base);
+			Optional<Biome> other = loaded(registry, recipe.other);
+			if (base.isPresent() && other.isPresent() && loaded(registry, recipe.made).isEmpty()) {
+				registry.register(recipe.made, make(recipe, base.get(), other.get(), everyBiomesSteps), RegistrationInfo.BUILT_IN);
 			}
 		}
+	}
+
+	/**
+	 * A biome that has really been registered. While registries load, the game reserves an empty slot for any biome
+	 * something else has asked for by name, so a name being present does not mean the biome is.
+	 */
+	public static Optional<Biome> loaded(final Registry<Biome> registry, final ResourceKey<Biome> key) {
+		return registry.get(key).filter(Holder.Reference::isBound).map(Holder.Reference::value);
 	}
 
 	private static Biome make(final Recipe recipe, final Biome base, final Biome other, final List<List<List<Holder<PlacedFeature>>>> everyBiomesSteps) {

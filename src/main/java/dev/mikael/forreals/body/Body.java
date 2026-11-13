@@ -2,6 +2,7 @@ package dev.mikael.forreals.body;
 
 import com.mojang.serialization.Codec;
 import dev.mikael.forreals.ForReals;
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.body.BodyHeat.Clothing;
 import dev.mikael.forreals.body.BodyHeat.Stage;
 import dev.mikael.forreals.climate.Climate;
@@ -57,6 +58,10 @@ public final class Body {
 	}
 
 	public static void tick(final MinecraftServer server) {
+		if (!Switch.isOn()) {
+			return;
+		}
+
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			if ((server.getTickCount() + player.getId()) % UPDATE_TICKS == 0) {
 				for (int i = 0; i < WorldTime.speedUp(); i++) {

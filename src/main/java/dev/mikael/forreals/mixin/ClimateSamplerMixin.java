@@ -1,6 +1,7 @@
 package dev.mikael.forreals.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import dev.mikael.forreals.Switch;
 import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +16,10 @@ abstract class ClimateSamplerMixin {
 	// Rain comes off the sea, so the deeper inland a place is, the drier it reads when biomes are chosen.
 	@ModifyReturnValue(method = "sample", at = @At("RETURN"))
 	private Climate.TargetPoint forreals$coastsAreWetAndInteriorsDry(final Climate.TargetPoint point) {
+		if (!Switch.isOn()) {
+			return point;
+		}
+
 		long humidity = point.humidity() - (long)(DRIER_PER_UNIT_INLAND * (point.continentalness() - NEAR_THE_COAST));
 		return new Climate.TargetPoint(point.temperature(), humidity, point.continentalness(), point.erosion(), point.depth(), point.weirdness());
 	}

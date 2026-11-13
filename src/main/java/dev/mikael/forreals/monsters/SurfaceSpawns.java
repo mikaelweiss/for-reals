@@ -1,5 +1,6 @@
 package dev.mikael.forreals.monsters;
 
+import dev.mikael.forreals.Switch;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
@@ -14,6 +15,6 @@ public final class SurfaceSpawns {
 	}
 
 	public static boolean isOpenSky(final Level level, final BlockPos pos) {
-		return level.dimension() == Level.OVERWORLD && level.getBrightness(LightLayer.SKY, pos) > 0;
+		return Switch.isOn() && level.dimension() == Level.OVERWORLD && level.getBrightness(LightLayer.SKY, pos) > 0;
 	}
 }

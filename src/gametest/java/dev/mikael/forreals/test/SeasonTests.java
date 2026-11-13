@@ -39,6 +39,8 @@ public class SeasonTests {
 		TestClimate.pin(helper, TestClimate.TEMPERATE);
 		Holder<Biome> summer = look(helper, MIDSUMMER_NOON);
 		Holder<Biome> fall = look(helper, MIDFALL);
+		// A passing warm spell can turn a temperate winter night to rain. A frozen land snows through any of them.
+		TestClimate.pin(helper, TestClimate.FROZEN);
 		Holder<Biome> winter = look(helper, MIDWINTER_NIGHT);
 		String realName = real.unwrapKey().orElseThrow().identifier().getPath();
 		helper.assertTrue(summer.getRegisteredName().endsWith(realName + "/summer_rain"), "midsummer showed " + summer.getRegisteredName());

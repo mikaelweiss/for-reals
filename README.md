@@ -29,4 +29,12 @@ The design is in [docs/](docs): what vanilla gets wrong, the principles, and the
 
 ## Installation
 
-Install the Fabric server launcher for 26.3, then put the mod jar and the Fabric API jar in the server's `mods/` folder.
+Put the mod jar and the Fabric API jar in the `mods/` folder of a Fabric 26.3 server or client instance.
+
+Installing the mod changes nothing by itself. Each world chooses whether to use it, through a data pack named `forreals:core` that ships inside the jar and is off by default. A world with the pack off plays as vanilla.
+
+- **New singleplayer world:** on the Create World screen, open Data Packs and move For Reals to the selected side.
+- **New server world:** before the first start, add `forreals:core` to `initial-enabled-packs` in `server.properties`.
+- **Existing world or server:** run `/datapack enable "forreals:core"`, then close the world or restart the server. The mod starts when the world next loads.
+
+Choose once per world. A world that turns the pack off again keeps the new biomes in the chunks it already generated and loses its wild herd animals.

@@ -11,6 +11,10 @@ Four pieces. Everything else reads from them.
 - **Weather field.** Storms and air masses computed from the world seed, place, and time. It holds no state, so it can be evaluated for any future moment.
 - **Herd ledger.** Every wild herd on the map, saved with the world, simulated cheaply when nobody is near.
 
+## Switch
+
+**Each world chooses whether to use the mod.** The mod ships a data pack that is off by default. Minecraft saves the choice in the world. With the pack off, every rule below is off and the world plays as vanilla. The choice takes effect when the world loads.
+
 ## Time
 
 1. **A year has four seasons.** The calendar counts days on the overworld clock.

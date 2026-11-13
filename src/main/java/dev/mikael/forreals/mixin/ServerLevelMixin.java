@@ -2,6 +2,7 @@ package dev.mikael.forreals.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.plants.WildPlants;
 import dev.mikael.forreals.time.WorldTime;
@@ -23,6 +24,10 @@ abstract class ServerLevelMixin {
 	// Answering "not enough sleepers" keeps vanilla from jumping the clock to morning and clearing the weather.
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/SleepStatus;areEnoughSleeping(I)Z"))
 	private boolean forreals$sleepPassesTime(final SleepStatus sleepers, final int percentage, final Operation<Boolean> original) {
+		if (!Switch.isOn()) {
+			return original.call(sleepers, percentage);
+		}
+
 		ServerLevel level = (ServerLevel)(Object)this;
 		if (level.dimension() == Level.OVERWORLD) {
 			WorldTime.setSleeping(original.call(sleepers, percentage) && sleepers.areEnoughDeepSleeping(percentage, level.players()));

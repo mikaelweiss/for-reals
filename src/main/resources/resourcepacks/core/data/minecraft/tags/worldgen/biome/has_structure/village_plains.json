@@ -1,0 +1,13 @@
+{
+	"replace": false,
+	"values": [
+		{
+			"id": "forreals:steppe",
+			"required": false
+		},
+		{
+			"id": "forreals:prairie",
+			"required": false
+		}
+	]
+}

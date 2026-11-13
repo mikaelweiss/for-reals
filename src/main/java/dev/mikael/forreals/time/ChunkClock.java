@@ -2,6 +2,8 @@ package dev.mikael.forreals.time;
 
 import com.mojang.serialization.Codec;
 import dev.mikael.forreals.ForReals;
+import dev.mikael.forreals.Switch;
+import dev.mikael.forreals.climate.Climate;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 /**
@@ -41,7 +42,7 @@ public final class ChunkClock {
 	}
 
 	public static void chunkLoaded(final ServerLevel level, final LevelChunk chunk) {
-		if (level.dimension() != Level.OVERWORLD) {
+		if (!Climate.hasClimate(level)) {
 			return;
 		}
 
@@ -58,7 +59,7 @@ public final class ChunkClock {
 	}
 
 	public static void chunkUnloaded(final ServerLevel level, final LevelChunk chunk) {
-		if (level.dimension() == Level.OVERWORLD) {
+		if (Climate.hasClimate(level)) {
 			LOADED.remove(chunk.getPos().pack());
 			chunk.setAttached(LAST_ACTIVE, WorldTime.ticks(level.getServer()));
 		}
@@ -66,6 +67,10 @@ public final class ChunkClock {
 
 	/** Chunks still loaded when the server stops never get an unload, so they are stamped here. */
 	public static void serverStopping(final MinecraftServer server) {
+		if (!Switch.isOn()) {
+			return;
+		}
+
 		ServerLevel overworld = server.overworld();
 		long now = WorldTime.ticks(server);
 		LOADED.forEach(packed -> {

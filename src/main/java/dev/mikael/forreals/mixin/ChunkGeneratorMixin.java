@@ -1,5 +1,6 @@
 package dev.mikael.forreals.mixin;
 
+import dev.mikael.forreals.Switch;
 import dev.mikael.forreals.animals.SpeciesTypes;
 import dev.mikael.forreals.climate.Climate;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -57,7 +58,7 @@ abstract class ChunkGeneratorMixin {
 		@Local(argsOnly = true) final WorldGenLevel level
 	) {
 		boolean placed = false;
-		for (int planting = Vegetation.plantings(level, feature, origin); planting > 0; planting--) {
+		for (int planting = Switch.isOn() ? Vegetation.plantings(level, feature, origin) : 1; planting > 0; planting--) {
 			placed |= original.call(placer, feature, random, origin);
 		}
 

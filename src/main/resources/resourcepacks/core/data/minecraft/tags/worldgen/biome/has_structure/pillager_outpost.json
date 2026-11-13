@@ -1,0 +1,21 @@
+{
+	"replace": false,
+	"values": [
+		{
+			"id": "forreals:steppe",
+			"required": false
+		},
+		{
+			"id": "forreals:prairie",
+			"required": false
+		},
+		{
+			"id": "forreals:scrubland",
+			"required": false
+		},
+		{
+			"id": "forreals:tundra",
+			"required": false
+		}
+	]
+}

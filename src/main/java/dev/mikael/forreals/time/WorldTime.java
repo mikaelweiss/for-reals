@@ -1,5 +1,6 @@
 package dev.mikael.forreals.time;
 
+import dev.mikael.forreals.Switch;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.clock.ServerClockManager;
@@ -34,7 +35,7 @@ public final class WorldTime {
 	}
 
 	public static void tick(final MinecraftServer server) {
-		if (isPaused(server)) {
+		if (!Switch.isOn() || isPaused(server)) {
 			sleeping = false;
 			return;
 		}
