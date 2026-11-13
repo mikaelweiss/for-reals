@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "forreals-test",
+	"version": "1.0.0",
+	"name": "For Reals Tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-gametest": [
+			"dev.mikael.forreals.test.MonsterTests"
+		]
+	},
+	"depends": {
+		"forreals": "*"
+	}
+}
