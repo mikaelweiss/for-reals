@@ -29,6 +29,7 @@ public class ForReals implements ModInitializer {
 		ServerTickEvents.END_SERVER_TICK.register(Body::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Herds::tick);
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> Herds.chunkLoaded(level, chunk));
+		ServerEntityEvents.ENTITY_LOAD.register(Herds::entityLoaded);
 		ServerEntityEvents.ENTITY_UNLOAD.register(Herds::entityUnloaded);
 		ServerLivingEntityEvents.AFTER_DEATH.register(Herds::died);
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> ChunkClock.chunkLoaded(level, chunk));

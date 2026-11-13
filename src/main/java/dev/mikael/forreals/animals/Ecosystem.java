@@ -26,7 +26,7 @@ public final class Ecosystem {
 	private static final double GRAZER_HUNGER_PER_UNFED_HOUR = 1.0 / 48;
 	private static final double GRAZER_RECOVERY_PER_FED_HOUR = 1.0 / 12;
 	private static final double PREDATOR_HUNGER_PER_HOUR = 1.0 / (4 * HOURS_PER_DAY);
-	private static final double DAYS_OF_FOOD_IN_A_FULL_BELLY = 4;
+	static final double DAYS_OF_FOOD_IN_A_FULL_BELLY = 4;
 	private static final double STARVING_SHARE_LOST_PER_HOUR = 0.01;
 	private static final double STARVING = 0.9;
 	private static final double PREDATOR_STARVES_ONE_PER_HOURS = 6;
@@ -188,6 +188,14 @@ public final class Ecosystem {
 
 	/** A hungry herd walks toward whichever neighboring range offers clearly more food than the one it is on. */
 	private void seekBetterLand(final Herd herd, final long ticks) {
+		long target = this.betterLandFor(herd, ticks);
+		if (target != herd.range()) {
+			travelToward(herd, Range.center(Range.xOf(target)), Range.center(Range.zOf(target)));
+		}
+	}
+
+	/** The neighboring range clearly worth leaving for, or the herd's own range if none is. */
+	public long betterLandFor(final Herd herd, final long ticks) {
 		long here = herd.range();
 		double best = this.landScore(herd, here, ticks) * WORTH_MOVING_FOR;
 		long target = here;
@@ -202,9 +210,7 @@ public final class Ecosystem {
 			}
 		}
 
-		if (target != here) {
-			travelToward(herd, Range.center(Range.xOf(target)), Range.center(Range.zOf(target)));
-		}
+		return target;
 	}
 
 	/** Only a starving herd gambles on land nobody has seen. */

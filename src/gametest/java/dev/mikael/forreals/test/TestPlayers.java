@@ -34,7 +34,15 @@ final class TestPlayers {
 	}
 
 	static void leave(final ServerPlayer player) {
-		player.level().getServer().getPlayerList().remove(player);
+		MinecraftServer server = player.level().getServer();
+		if (server.getPlayerList().getPlayer(player.getUUID()) == player) {
+			server.getPlayerList().remove(player);
+		}
+	}
+
+	/** Takes the player offline at a set tick whatever happens, for a test that polls until it times out. */
+	static void leaveBy(final GameTestHelper helper, final ServerPlayer player, final int tick) {
+		helper.runAfterDelay(tick, () -> leave(player));
 	}
 
 	/** Runs assertions and takes the player offline if they fail, so a failed test cannot leak a player into the next. */

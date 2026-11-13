@@ -4,9 +4,12 @@ import com.mojang.serialization.Codec;
 import dev.mikael.forreals.ForReals;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.time.WorldTime;
+import dev.mikael.forreals.weather.Sky;
+import dev.mikael.forreals.weather.Weather;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -28,6 +31,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Joins the herd ledger to the running world. A herd whose land is loaded walks around as real animals. Those animals
@@ -46,13 +50,29 @@ public final class Herds {
 	private static final double NUDGE_BLOCKS = 16;
 	private static final double FEAR_PER_MEMBER_KILLED_BY_A_PLAYER = 0.25;
 
+	private static final int ADOPTS_INTO_HERDS_WITHIN = 48;
+	private static final float HERD_MOVES_ON_WHEN_HUNGRIER_THAN = 0.35F;
+	private static final double HEADING_BLOCKS = 24;
+	private static final double ARRIVED_WITHIN = 6;
+	private static final int HEADING_LASTS_TICKS = 1200;
+	private static final int STORM_WARNING_TICKS = 3600;
+	private static final double STORM_FROM = 0.4;
+	private static final double SHARES_A_KILL_WITHIN = 16;
+
 	private static final Map<Integer, Set<Mob>> WALKING = new HashMap<>();
+	private static final Map<Integer, HerdMood> MOODS = new HashMap<>();
 
 	private Herds() {
 	}
 
 	public static void forgetWorld() {
 		WALKING.clear();
+		MOODS.clear();
+		Owned.forgetWorld();
+	}
+
+	static HerdMood mood(final Herd herd) {
+		return MOODS.computeIfAbsent(herd.id(), id -> new HerdMood());
 	}
 
 	public static Ecosystem ecosystem(final MinecraftServer server) {
@@ -93,11 +113,34 @@ public final class Herds {
 			ledger.ecosystem().advanceHour(hour * Ecosystem.HOUR_TICKS, new Random(seed ^ hour), Herds::walksTheWorld);
 		}
 
+		ServerLevel level = server.overworld();
+		if (server.getTickCount() % 20 == 0) {
+			liveASecond(ledger.ecosystem());
+		}
+
 		if (server.getTickCount() % HEAD_COUNT_TICKS == 0) {
-			ServerLevel level = server.overworld();
-			followWalkingHerds(ledger.ecosystem());
+			followWalkingHerds(level, ledger.ecosystem());
 			if (level.getGameRules().get(GameRules.SPAWN_MOBS)) {
 				bringHerdsIntoTheWorld(level);
+			}
+		}
+	}
+
+	private static void liveASecond(final Ecosystem ecosystem) {
+		for (Herd herd : ecosystem.herds()) {
+			for (Mob member : List.copyOf(members(herd))) {
+				if (Owned.showsOwnership(member)) {
+					Owned.claim(member);
+				} else {
+					Behavior.liveASecond(member, herd.species(), herd);
+				}
+			}
+		}
+
+		for (Mob animal : Owned.nearby()) {
+			Species species = SpeciesTypes.speciesOf(animal.getType());
+			if (species != null) {
+				Owned.liveASecond(animal, species);
 			}
 		}
 	}
@@ -130,9 +173,14 @@ public final class Herds {
 		ecosystem.explore(key, range, new Random(level.getSeed() ^ key * 0x9E3779B97F4A7C15L));
 	}
 
-	/** Moves each walking herd's ledger entry to where its animals actually are, and records how well fed they are. */
-	private static void followWalkingHerds(final Ecosystem ecosystem) {
+	/**
+	 * Moves each walking herd's ledger entry to where its animals actually are, records how well fed they are, and
+	 * decides what the herd does next as a group.
+	 */
+	private static void followWalkingHerds(final ServerLevel level, final Ecosystem ecosystem) {
 		WALKING.values().removeIf(Set::isEmpty);
+		MOODS.keySet().retainAll(WALKING.keySet());
+		long ticks = WorldTime.ticks(level.getServer());
 		for (Herd herd : ecosystem.herds()) {
 			Set<Mob> members = members(herd);
 			if (members.isEmpty()) {
@@ -150,6 +198,30 @@ public final class Herds {
 
 			herd.moveTo(x / members.size(), z / members.size());
 			herd.setHunger(1 - energy / members.size());
+			decideAsAHerd(level, ecosystem, herd, ticks);
+		}
+	}
+
+	/** A hungry herd picks a direction and walks it until it finds food. A herd that sees a storm coming pulls in tight. */
+	private static void decideAsAHerd(final ServerLevel level, final Ecosystem ecosystem, final Herd herd, final long ticks) {
+		HerdMood mood = mood(herd);
+		BlockPos center = BlockPos.containing(herd.x(), level.getSeaLevel(), herd.z());
+		mood.bunching = Weather.sky(level, center).precipitation() > STORM_FROM
+			|| Sky.over(Weather.field(level), Climate.base(level, center), herd.x(), herd.z(), ticks + STORM_WARNING_TICKS).precipitation() > STORM_FROM;
+		if (herd.hunger() <= HERD_MOVES_ON_WHEN_HUNGRIER_THAN) {
+			mood.heading = null;
+			return;
+		}
+
+		long now = level.getGameTime();
+		boolean arrived = mood.heading != null && Math.hypot(mood.heading.x - herd.x(), mood.heading.z - herd.z()) < ARRIVED_WITHIN;
+		if (mood.heading == null || arrived || now > mood.headingExpires) {
+			long better = ecosystem.betterLandFor(herd, ticks);
+			double direction = better == herd.range()
+				? level.getRandom().nextDouble() * 2 * Math.PI
+				: Math.atan2(Range.center(Range.zOf(better)) - herd.z(), Range.center(Range.xOf(better)) - herd.x());
+			mood.heading = new Vec3(herd.x() + Math.cos(direction) * HEADING_BLOCKS, 0, herd.z() + Math.sin(direction) * HEADING_BLOCKS);
+			mood.headingExpires = now + HEADING_LASTS_TICKS;
 		}
 	}
 
@@ -200,6 +272,71 @@ public final class Herds {
 		member.setAttached(HERD, herd.id());
 		member.setAttached(ENERGY, (float)(1 - herd.hunger()));
 		WALKING.computeIfAbsent(herd.id(), id -> new HashSet<>()).add(member);
+		Behavior.install(member, herd.species(), true);
+	}
+
+	/** Takes a living animal out of its herd. It becomes an ordinary saved animal. */
+	static void leaveHerd(final Mob animal) {
+		Herd herd = herdOf(animal);
+		Integer id = animal.removeAttached(HERD);
+		if (id != null && WALKING.containsKey(id)) {
+			WALKING.get(id).remove(animal);
+		}
+
+		if (herd != null) {
+			herd.addMembers(-1);
+		}
+	}
+
+	/**
+	 * Sorts out an animal the herds did not place: an owned one coming back with its chunk, or one from before the
+	 * herds existed. The second kind is owned if it looks owned, and otherwise joins a wild herd.
+	 */
+	public static void entityLoaded(final Entity entity, final ServerLevel level) {
+		if (!(entity instanceof Mob animal) || !Climate.hasClimate(level) || isWild(animal)) {
+			return;
+		}
+
+		Species species = SpeciesTypes.speciesOf(animal.getType());
+		if (species == null) {
+			return;
+		}
+
+		// Looking at the blocks around an entity while its chunk is still loading can stall the server.
+		level.getServer().execute(() -> {
+			if (animal.isRemoved() || isWild(animal)) {
+				return;
+			}
+
+			if (Owned.isOwned(animal)) {
+				Owned.returned(animal, species);
+			} else if (Owned.showsOwnership(animal) || Owned.isBesideAFence(animal)) {
+				Owned.claim(animal);
+				Behavior.install(animal, species, false);
+			} else {
+				joinAWildHerd(level, animal, species);
+			}
+		});
+	}
+
+	private static void joinAWildHerd(final ServerLevel level, final Mob animal, final Species species) {
+		Ecosystem ecosystem = ecosystem(level.getServer());
+		Herd nearest = null;
+		double nearestDistance = ADOPTS_INTO_HERDS_WITHIN;
+		for (Herd herd : ecosystem.herds()) {
+			double distance = Math.hypot(herd.x() - animal.getX(), herd.z() - animal.getZ());
+			if (herd.species() == species && distance < nearestDistance && herd.count() < species.largestHerd()) {
+				nearest = herd;
+				nearestDistance = distance;
+			}
+		}
+
+		if (nearest == null) {
+			nearest = ecosystem.addHerd(species, animal.getX(), animal.getZ(), 0);
+		}
+
+		nearest.addMembers(1);
+		enroll(animal, nearest);
 	}
 
 	public static float energyOf(final Entity animal) {
@@ -234,14 +371,33 @@ public final class Herds {
 		if (herd != null && cause.getEntity() instanceof Player) {
 			herd.setFear(herd.fear() + FEAR_PER_MEMBER_KILLED_BY_A_PLAYER);
 		}
+
+		Species eaten = SpeciesTypes.speciesOf(animal.getType());
+		if (eaten != null && cause.getEntity() instanceof Mob killer) {
+			shareTheKill(killer, eaten);
+		}
 	}
 
-	/** Young born to a wild animal join its herd. */
+	/** A kill feeds the whole pack that is close enough to eat. */
+	private static void shareTheKill(final Mob killer, final Species eaten) {
+		Herd pack = herdOf(killer);
+		if (pack == null || !pack.species().isPredator()) {
+			return;
+		}
+
+		List<Mob> eaters = members(pack).stream().filter(member -> member.distanceTo(killer) <= SHARES_A_KILL_WITHIN).toList();
+		float share = (float)(eaten.bodyFood() / (eaters.size() * pack.species().dailyFood() * Ecosystem.DAYS_OF_FOOD_IN_A_FULL_BELLY));
+		eaters.forEach(eater -> setEnergy(eater, energyOf(eater) + share));
+	}
+
+	/** Young born to a wild animal join its herd. Young born to an owned animal are owned. */
 	public static void childBorn(final Entity parent, final AgeableMob child) {
 		Herd herd = herdOf(parent);
 		if (herd != null) {
 			herd.addMembers(1);
 			enroll(child, herd);
+		} else if (Owned.isOwned(parent)) {
+			Owned.claim(child);
 		}
 	}
 }
