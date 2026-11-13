@@ -7,7 +7,7 @@
 	"authors": [
 		"Mikael"
 	],
-	"license": "CC0-1.0",
+	"license": "CC-BY-4.0",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
