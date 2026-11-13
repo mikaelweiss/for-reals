@@ -62,7 +62,7 @@ Fish and water life stay vanilla.
 
 ## Monsters
 
-33. **No hostile mobs spawn under open sky in the overworld.** Phantoms and patrols are off. Caves, the Nether, the End, pillager outposts, witch huts, and raids are unchanged.
+33. **No hostile mobs spawn under open sky in the overworld.** Phantoms, patrols, zombie sieges, and lightning skeleton traps are off. Caves, the Nether, the End, pillager outposts, witch huts, and raids are unchanged.
 
 ## New terrain
 
@@ -77,7 +77,12 @@ These apply to chunks generated after install.
 ## Limits
 
 - Birch and spruce leaves have fixed colors in the client. Only oak-type leaves and grass change with the season.
-- Bedrock clients do not show custom biome colors.
+- Bedrock players see the world's real biomes, with no seasonal colors. Where Java players see snow fall outside snowy biomes, Bedrock players see rain. Snow on the ground shows for everyone.
+- The game has no wolf howl sound. A hungry pack is heard as a deep bark that carries.
+- Only wild animals die of old age. Owned animals do not.
+- Bees and other animals that react to rain do not react to local weather.
+- A thunderstorm does not let a player sleep in the daytime.
+- Marsh has no standing pools of water.
 
 ## Tests
 

@@ -22,7 +22,10 @@ Requires Java 25.
 
 - `./gradlew runClient` launches the game with the mod for singleplayer testing.
 - `./gradlew runServer` launches a dedicated server with the mod. Accept the EULA in `run/eula.txt` on first launch.
-- `./gradlew build` writes the mod jar to `build/libs/`.
+- `./gradlew build` writes the mod jar to `build/libs/` and runs the unit tests.
+- `./gradlew runGameTest` runs the game tests in a headless server.
+
+The design is in [docs/](docs): what vanilla gets wrong, the principles, and the plan.
 
 ## Installation
 
