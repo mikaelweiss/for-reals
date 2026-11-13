@@ -15,6 +15,10 @@ dependencies {
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/forreals.classtweaker")
+}
+
 fabricApi {
 	configureTests {
 		createSourceSet = true

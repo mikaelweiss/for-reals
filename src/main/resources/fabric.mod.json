@@ -22,5 +22,6 @@
 	},
 	"mixins": [
 		"forreals.mixins.json"
-	]
+	],
+	"accessWidener": "forreals.classtweaker"
 }

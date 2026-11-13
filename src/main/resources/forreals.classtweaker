@@ -1,0 +1,5 @@
+classTweaker	v1	official
+
+accessible	class	net/minecraft/world/level/biome/Biome$ClimateSettings
+accessible	field	net/minecraft/world/level/biome/Biome	climateSettings	Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
+accessible	method	net/minecraft/server/level/ServerLevel	findLightningTargetAround	(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/core/BlockPos;
