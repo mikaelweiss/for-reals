@@ -3,6 +3,8 @@ package dev.mikael.forreals;
 import net.fabricmc.api.ModInitializer;
 import dev.mikael.forreals.body.Body;
 import dev.mikael.forreals.climate.Climate;
+import dev.mikael.forreals.plants.Crops;
+import dev.mikael.forreals.plants.WildPlants;
 import dev.mikael.forreals.time.ChunkClock;
 import dev.mikael.forreals.time.WorldTime;
 import dev.mikael.forreals.weather.SnowAndIce;
@@ -25,6 +27,8 @@ public class ForReals implements ModInitializer {
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> ChunkClock.chunkLoaded(level, chunk));
 		ServerChunkEvents.CHUNK_UNLOAD.register(ChunkClock::chunkUnloaded);
 		ChunkClock.onCatchUp(SnowAndIce::catchUp);
+		ChunkClock.onCatchUp(Crops::catchUp);
+		ChunkClock.onCatchUp(WildPlants::catchUp);
 		ServerLifecycleEvents.SERVER_STOPPING.register(ChunkClock::serverStopping);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			Climate.forgetWorld();

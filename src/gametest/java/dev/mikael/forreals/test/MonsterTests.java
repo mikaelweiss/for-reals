@@ -22,7 +22,8 @@ public class MonsterTests {
 		});
 	}
 
-	@GameTest(skyAccess = true)
+	/** The light engine works on its own thread, so the room goes dark some ticks after it is built. */
+	@GameTest(skyAccess = true, maxTicks = 600)
 	public void monstersSpawnUnderARoof(final GameTestHelper helper) {
 		for (int x = 0; x < 8; x++) {
 			for (int z = 0; z < 8; z++) {

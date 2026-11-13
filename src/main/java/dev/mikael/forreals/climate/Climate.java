@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 /** The temperature of places in a running world. Only the overworld has a climate. */
 public final class Climate {
@@ -116,10 +117,30 @@ public final class Climate {
 
 	/** Temperature felt by something standing at this spot. Cover holds the yearly average. Fires and lava add heat. */
 	public static double feltAt(final ServerLevel level, final BlockPos pos) {
-		double open = openAir(level, pos);
-		double cover = 1 - (double)level.getBrightness(LightLayer.SKY, pos) / MAX_SKY_LIGHT;
+		return feltAt(level, pos, openAir(level, pos));
+	}
+
+	/** As {@link #feltAt(ServerLevel, BlockPos)}, for a given open-air temperature instead of the current one. */
+	public static double feltAt(final ServerLevel level, final BlockPos pos, final double openAir) {
 		double underCover = ClimateModel.underCover(base(level, pos), pos.getY() - level.getSeaLevel());
-		return open + cover * (underCover - open) + heatAround(level, pos);
+		return openAir + cover(level, pos) * (underCover - openAir) + heatAround(level, pos);
+	}
+
+	/**
+	 * How sheltered a spot is, from 0 in the open to 1 deep inside. Anything overhead counts for half, glass
+	 * included, so a greenhouse works. Darkness counts for the rest.
+	 */
+	private static double cover(final ServerLevel level, final BlockPos pos) {
+		if (!hasRoof(level, pos)) {
+			return 0;
+		}
+
+		return 0.5 + 0.5 * (1 - (double)level.getBrightness(LightLayer.SKY, pos) / MAX_SKY_LIGHT);
+	}
+
+	/** True when anything solid is overhead, glass and leaves included. */
+	public static boolean hasRoof(final ServerLevel level, final BlockPos pos) {
+		return level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY() > pos.getY();
 	}
 
 	private static double heatAround(final ServerLevel level, final BlockPos pos) {

@@ -19,7 +19,8 @@ final class TestClimate {
 
 	static final BiomeClimate FROZEN = BiomeClimate.fromVanilla(-0.5, 0.8);
 	static final BiomeClimate TEMPERATE = BiomeClimate.fromVanilla(0.7, 0.8);
-	static final BiomeClimate DESERT = BiomeClimate.fromVanilla(2.0, 0.0);
+	/** Mild on average, with afternoons hot enough that no passing cold spell makes them bearable. */
+	static final BiomeClimate SCORCHING_AFTERNOONS = new BiomeClimate(26, 0, 30, 0);
 
 	private static final int PINNED_CHUNK_REACH = 6;
 

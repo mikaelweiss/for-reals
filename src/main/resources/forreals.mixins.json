@@ -3,6 +3,7 @@
 	"package": "dev.mikael.forreals.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
+		"BlockStateBaseMixin",
 		"ChunkGeneratorMixin",
 		"FireBlockMixin",
 		"LevelMixin",

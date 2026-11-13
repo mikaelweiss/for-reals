@@ -83,7 +83,7 @@ public class BodyTests {
 
 	@GameTest(environment = TestClimate.ENVIRONMENT, skyAccess = true)
 	public void desertSunOverheatsAndGoingIndoorsFixesIt(final GameTestHelper helper) {
-		TestClimate.pin(helper, TestClimate.DESERT);
+		TestClimate.pin(helper, TestClimate.SCORCHING_AFTERNOONS);
 		ServerPlayer player = playerOutside(helper, MIDSUMMER_AFTERNOON);
 		TestPlayers.leaveOnFailure(player, () -> {
 			live(player, FIVE_MINUTES);
@@ -102,7 +102,7 @@ public class BodyTests {
 		});
 		helper.runAfterDelay(10, () -> {
 			TestPlayers.leaveOnFailure(player, () -> {
-				TestClimate.pin(helper, TestClimate.DESERT);
+				TestClimate.pin(helper, TestClimate.SCORCHING_AFTERNOONS);
 				TestClimate.setCalendar(helper, MIDSUMMER_AFTERNOON);
 				live(player, FIVE_MINUTES);
 				helper.assertTrue(Body.exposure(player) == 0, "a closed room left the player at exposure " + Body.exposure(player));

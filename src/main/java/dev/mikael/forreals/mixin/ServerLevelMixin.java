@@ -3,6 +3,7 @@ package dev.mikael.forreals.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.mikael.forreals.climate.Climate;
+import dev.mikael.forreals.plants.WildPlants;
 import dev.mikael.forreals.time.WorldTime;
 import dev.mikael.forreals.weather.SnowAndIce;
 import dev.mikael.forreals.weather.Weather;
@@ -52,10 +53,11 @@ abstract class ServerLevelMixin {
 	}
 
 	@Inject(method = "tickChunk", at = @At("HEAD"))
-	private void forreals$settleSnowAndIce(final LevelChunk chunk, final int randomTickSpeed, final CallbackInfo ci) {
+	private void forreals$tendTheGround(final LevelChunk chunk, final int randomTickSpeed, final CallbackInfo ci) {
 		ServerLevel level = (ServerLevel)(Object)this;
 		if (Climate.hasClimate(level)) {
 			SnowAndIce.tickChunk(level, chunk);
+			WildPlants.tickChunk(level, chunk);
 		}
 	}
 

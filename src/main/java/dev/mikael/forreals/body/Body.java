@@ -96,12 +96,13 @@ public final class Body {
 
 		BlockPos head = BlockPos.containing(player.getEyePosition());
 		double felt = Climate.feltAt(level, head);
-		if (level.canSeeSky(head)) {
-			Sky sky = Weather.sky(level, head);
+		Sky sky = Weather.sky(level, head);
+		if (!Climate.hasRoof(level, head)) {
 			felt -= STORM_WIND_DEGREES * sky.precipitation();
-			if (level.isBrightOutside() && felt > SUN_BURNS_ABOVE) {
-				felt += SUN_DEGREES * (1 - sky.cloudCover());
-			}
+		}
+
+		if (level.canSeeSky(head) && level.isBrightOutside() && felt > SUN_BURNS_ABOVE) {
+			felt += SUN_DEGREES * (1 - sky.cloudCover());
 		}
 
 		if (player.isInWaterOrRain()) {
