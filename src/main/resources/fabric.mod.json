@@ -1,0 +1,23 @@
+{
+	"schemaVersion": 1,
+	"id": "forreals",
+	"version": "${version}",
+	"name": "For Reals",
+	"description": "",
+	"authors": [
+		"Mikael"
+	],
+	"license": "CC0-1.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.mikael.forreals.ForReals"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.0",
+		"fabric-api": "*",
+		"minecraft": ">=26.3 <26.4",
+		"java": ">=25"
+	}
+}
