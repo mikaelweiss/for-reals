@@ -12,6 +12,7 @@
 		"NaturalSpawnerMixin",
 		"PatrolSpawnerMixin",
 		"PhantomSpawnerMixin",
+		"PlayerChunkSenderMixin",
 		"ServerClockManagerMixin",
 		"ServerLevelMixin",
 		"VillageSiegeMixin"

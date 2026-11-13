@@ -5,6 +5,7 @@ import dev.mikael.forreals.animals.Herds;
 import dev.mikael.forreals.body.Body;
 import dev.mikael.forreals.climate.Climate;
 import dev.mikael.forreals.plants.Crops;
+import dev.mikael.forreals.seasons.SeasonalLook;
 import dev.mikael.forreals.plants.WildPlants;
 import dev.mikael.forreals.time.ChunkClock;
 import dev.mikael.forreals.time.WorldTime;
@@ -24,6 +25,8 @@ public class ForReals implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		SeasonalLook.registerLooks();
+		ServerTickEvents.END_SERVER_TICK.register(SeasonalLook::tick);
 		ServerTickEvents.START_SERVER_TICK.register(WorldTime::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Weather::showPlayersTheirSky);
 		ServerTickEvents.END_SERVER_TICK.register(Body::tick);
@@ -43,6 +46,7 @@ public class ForReals implements ModInitializer {
 			Weather.forgetWorld();
 			SnowAndIce.forgetWorld();
 			Herds.forgetWorld();
+			SeasonalLook.forgetWorld();
 		});
 		ServerLifecycleEvents.SERVER_STARTED.register(server ->
 				LOGGER.info("For Reals loaded on {} server", server.isDedicatedServer() ? "dedicated" : "integrated"));

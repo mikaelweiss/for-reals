@@ -92,6 +92,12 @@ final class Behavior {
 		if (herd != null && species == Species.WOLF && energy < PACK_GROWS_RESTLESS_BELOW) {
 			warnOfHungryWolves(animal, level);
 		}
+
+		// Only wild animals die of old age. An owned animal gives no sign of its age, so losing one to it would be unfair.
+		double secondsInALife = species.lifespanYears() * Calendar.DAYS_PER_YEAR * SECONDS_PER_DAY;
+		if (herd != null && animal.getRandom().nextDouble() < WorldTime.speedUp() / secondsInALife) {
+			animal.kill(level);
+		}
 	}
 
 	/** A hungry pack is heard before it is seen. The game has no howl, so it is a deep bark that carries. */
