@@ -118,7 +118,7 @@ public class PlantTests {
 	@GameTest(environment = TestClimate.ENVIRONMENT, skyAccess = true)
 	public void meadowGreensInSummerAndDiesBackInWinter(final GameTestHelper helper) {
 		floor(helper, Blocks.GRASS_BLOCK);
-		season(helper, TestClimate.TEMPERATE, MIDSUMMER);
+		season(helper, TestClimate.GROWING_WEATHER, MIDSUMMER);
 		ServerLevel level = helper.getLevel();
 		for (int visit = 0; visit < 40; visit++) {
 			for (int x = 0; x < YARD; x++) {
@@ -149,7 +149,7 @@ public class PlantTests {
 		floor(helper, Blocks.GRASS_BLOCK);
 		BlockPos canopy = new BlockPos(3, 5, 3);
 		helper.setBlock(canopy, Blocks.OAK_LEAVES);
-		season(helper, TestClimate.TEMPERATE, MIDSUMMER);
+		season(helper, TestClimate.GROWING_WEATHER, MIDSUMMER);
 		ServerLevel level = helper.getLevel();
 		for (int visit = 0; visit < 4000; visit++) {
 			WildPlants.tend(level, helper.absolutePos(canopy));

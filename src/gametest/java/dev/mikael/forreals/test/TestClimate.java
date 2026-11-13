@@ -19,6 +19,8 @@ final class TestClimate {
 
 	static final BiomeClimate FROZEN = BiomeClimate.fromVanilla(-0.5, 0.8);
 	static final BiomeClimate TEMPERATE = BiomeClimate.fromVanilla(0.7, 0.8);
+	/** Warm enough for wild plants to grow through any cold spell, at the height tests run above a test world's sea. */
+	static final BiomeClimate GROWING_WEATHER = new BiomeClimate(28, 0, 0, 0.8);
 	/** Mild on average, with afternoons hot enough that no passing cold spell makes them bearable. */
 	static final BiomeClimate SCORCHING_AFTERNOONS = new BiomeClimate(26, 0, 30, 0);
 

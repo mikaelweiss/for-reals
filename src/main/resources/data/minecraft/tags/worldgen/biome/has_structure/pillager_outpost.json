@@ -1,0 +1,9 @@
+{
+	"replace": false,
+	"values": [
+		"forreals:steppe",
+		"forreals:prairie",
+		"forreals:scrubland",
+		"forreals:tundra"
+	]
+}

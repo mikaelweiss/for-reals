@@ -19,10 +19,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
@@ -93,18 +94,18 @@ public final class SeasonalLook {
 		looksBuiltFor = null;
 	}
 
-	/** Adds the look-alikes as each biome loads, so they exist for any biome a datapack or another mod brings. */
-	public static void registerLooks() {
-		DynamicRegistrySetupCallback.EVENT.register(registries -> registries.registerEntryAdded(Registries.BIOME, (rawId, id, biome) -> {
-			if (id.getNamespace().equals(ForReals.MOD_ID) && id.getPath().startsWith(PREFIX)) {
-				return;
+	/**
+	 * Adds the look-alikes of every biome in a biome registry that has just finished loading, so they exist for any
+	 * biome a datapack or another mod brings.
+	 */
+	public static void addTo(final WritableRegistry<Biome> registry) {
+		for (Map.Entry<ResourceKey<Biome>, Biome> entry : List.copyOf(registry.entrySet())) {
+			Identifier id = entry.getKey().identifier();
+			boolean isALook = id.getNamespace().equals(ForReals.MOD_ID) && id.getPath().startsWith(PREFIX);
+			if (!isALook && !NEVER_SEE_THE_SKY.contains(entry.getKey())) {
+				registerLooksOf(registry, id, entry.getValue());
 			}
-
-			ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, id);
-			if (!NEVER_SEE_THE_SKY.contains(key)) {
-				registries.getOptional(Registries.BIOME).ifPresent(registry -> registerLooksOf(registry, id, biome));
-			}
-		}));
+		}
 	}
 
 	private static Identifier lookId(final Identifier biome, final LookStage stage, final int precipitation) {
@@ -113,14 +114,14 @@ public final class SeasonalLook {
 		);
 	}
 
-	private static void registerLooksOf(final Registry<Biome> registry, final Identifier id, final Biome biome) {
+	private static void registerLooksOf(final WritableRegistry<Biome> registry, final Identifier id, final Biome biome) {
 		BiomeSpecialEffects effects = biome.getSpecialEffects();
 		float downfall = biome.climateSettings.downfall();
 		int summerGrass = effects.grassColorOverride().orElseGet(() -> SummerColors.grass(biome.getBaseTemperature(), downfall));
 		int summerFoliage = effects.foliageColorOverride().orElseGet(() -> SummerColors.foliage(biome.getBaseTemperature(), downfall));
 		double seasonality = Math.clamp(BiomeClimate.fromVanilla(biome.getBaseTemperature(), downfall).seasonalSwing() / FULL_SEASONS_SWING, 0, 1);
 		for (LookStage stage : LookStage.values()) {
-			BiomeSpecialEffects look = new BiomeSpecialEffects(
+			BiomeSpecialEffects seasonal = new BiomeSpecialEffects(
 				effects.waterColor(),
 				Optional.of(stage.foliage(summerFoliage, seasonality)),
 				effects.dryFoliageColorOverride(),
@@ -128,17 +129,22 @@ public final class SeasonalLook {
 				effects.grassColorModifier()
 			);
 			for (int precipitation = 0; precipitation < PRECIPITATION.length; precipitation++) {
-				Registry.register(
-					registry,
-					lookId(id, stage, precipitation),
+				ResourceKey<Biome> look = ResourceKey.create(Registries.BIOME, lookId(id, stage, precipitation));
+				if (registry.containsKey(look)) {
+					continue;
+				}
+
+				registry.register(
+					look,
 					new Biome.BiomeBuilder()
 						.hasPrecipitation(biome.hasPrecipitation())
 						.temperature(precipitation == 0 ? RAIN_TEMPERATURE : SNOW_TEMPERATURE)
 						.downfall(downfall)
 						.putAttributes(biome.getAttributes())
-						.specialEffects(look)
+						.specialEffects(seasonal)
 						.generationSettings(BiomeGenerationSettings.EMPTY)
-						.build()
+						.build(),
+					RegistrationInfo.BUILT_IN
 				);
 			}
 		}

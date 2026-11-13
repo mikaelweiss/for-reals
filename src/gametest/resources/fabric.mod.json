@@ -11,6 +11,7 @@
 			"dev.mikael.forreals.test.MonsterTests",
 			"dev.mikael.forreals.test.PlantTests",
 			"dev.mikael.forreals.test.SeasonTests",
+			"dev.mikael.forreals.test.TerrainTests",
 			"dev.mikael.forreals.test.TimeTests",
 			"dev.mikael.forreals.test.WeatherTests"
 		],

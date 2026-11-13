@@ -25,7 +25,6 @@ public class ForReals implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		SeasonalLook.registerLooks();
 		ServerTickEvents.END_SERVER_TICK.register(SeasonalLook::tick);
 		ServerTickEvents.START_SERVER_TICK.register(WorldTime::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Weather::showPlayersTheirSky);

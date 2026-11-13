@@ -33,6 +33,10 @@ test {
 	useJUnitPlatform()
 }
 
+tasks.matching { it.name == "runServer" }.configureEach {
+	standardInput = System.in
+}
+
 processResources {
 	def version = project.version
 	inputs.property "version", version
