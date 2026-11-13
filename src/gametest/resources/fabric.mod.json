@@ -6,7 +6,8 @@
 	"environment": "*",
 	"entrypoints": {
 		"fabric-gametest": [
-			"dev.mikael.forreals.test.MonsterTests"
+			"dev.mikael.forreals.test.MonsterTests",
+			"dev.mikael.forreals.test.TimeTests"
 		]
 	},
 	"depends": {

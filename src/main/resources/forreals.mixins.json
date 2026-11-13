@@ -6,6 +6,8 @@
 		"ChunkGeneratorMixin",
 		"PatrolSpawnerMixin",
 		"PhantomSpawnerMixin",
+		"ServerClockManagerMixin",
+		"ServerLevelMixin",
 		"VillageSiegeMixin"
 	],
 	"injectors": {
